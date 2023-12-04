@@ -1,0 +1,127 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+		     xmlns:local="using:FileTagger.NET"
+			 x:DataType="local:FileViewerViewModel"
+			 xmlns:i="https://github.com/projektanker/icons.avalonia"
+			 xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="FileTagger.NET.FileViewer">
+
+	<UserControl.Resources>
+		<local:SetToStringConverter x:Key="setToString"/>
+	</UserControl.Resources>
+
+	<Grid Grid.Column="0" RowDefinitions="Auto,Auto,Auto,Auto,*">
+		<Grid VerticalAlignment="Center" Grid.Row="0"
+			  ColumnDefinitions="Auto,*,Auto,Auto">
+			<Label VerticalContentAlignment="Center" Grid.Column="0">地址栏：</Label>
+			<TextBox VerticalContentAlignment="Center" Grid.Column="1" Margin="0,0,8,0"
+					Text="{Binding Address}" KeyUp="AddressBar_KeyUp"></TextBox>
+			<Button Grid.Column="1" Margin="0,0,8,0" HorizontalAlignment="Right"
+					Command="{Binding GoUpCommand}"
+					i:Attached.Icon="mdi-folder-arrow-up-outline"
+					ToolTip.Tip="向上" />
+			<Button Grid.Column="2" Margin="0,0,8,0"
+					Command="{Binding GoToDirCommand}"
+					i:Attached.Icon="mdi-folder-arrow-right-outline"
+					ToolTip.Tip="转到" />
+			<Button Grid.Column="3"
+					Command="{Binding BrowseDirCommand}"
+					i:Attached.Icon="mdi-folder-search-outline"
+					ToolTip.Tip="浏览" />
+		</Grid>
+
+		<Separator Grid.Row="1" Margin="0,8,0,8"></Separator>
+
+		<Grid VerticalAlignment="Center" Grid.Row="2"
+			  ColumnDefinitions="Auto,Auto,Auto,*,Auto,Auto">
+			<Label VerticalContentAlignment="Center" Grid.Column="0">按标签筛选：</Label>
+			<ComboBox VerticalContentAlignment="Center" Grid.Column="1" MinWidth="180" Margin="0,0,12,0"
+					  ItemsSource="{Binding AllTags}" SelectedItem="{Binding TagFilter}"
+					  SelectionChanged="TagFilter_SelectionChanged" />
+			<Label VerticalContentAlignment="Center" Grid.Column="2">按文件名筛选：</Label>
+			<TextBox VerticalContentAlignment="Center" Grid.Column="3" Margin="0,0,12,0"
+					 Text="{Binding FilenameFilter}" KeyUp="FilenameFilter_KeyUp"></TextBox>
+			<Button Grid.Column="4" Margin="0,0,12,0"
+					i:Attached.Icon="mdi-filter-check-outline"
+					ToolTip.Tip="应用筛选"
+					Command="{Binding FilterFileListCommand}" />
+			<Button Grid.Column="5" 
+					i:Attached.Icon="mdi-filter-remove-outline"
+					ToolTip.Tip="清空筛选"
+					Command="{Binding ResetFilterCommand}" />
+		</Grid>
+
+		<Separator Grid.Row="3" Margin="0,8,0,8"></Separator>
+
+		<Grid Grid.Row="4" ColumnDefinitions="7*,Auto,*">
+			<DataGrid Grid.Column="0"
+					  CanUserReorderColumns="False"
+					  ItemsSource="{Binding FileList}"
+					  SelectionMode="Extended"
+					  SelectionChanged="Files_SelectionChanged"
+					  IsReadOnly="True"
+					  DoubleTapped="File_DoubleTapped">
+				<DataGrid.Columns>
+					<DataGridTextColumn Header="名称" Binding="{Binding Name}" Width="*" />
+					<DataGridTextColumn Header="修改时间" Binding="{Binding LastWriteTime}" />
+					<DataGridTextColumn Header="标签" Binding="{Binding Tags, Mode=OneWay, Converter={StaticResource setToString}}" />
+				</DataGrid.Columns>
+			</DataGrid>
+
+			<LayoutTransformControl Grid.Column="1" Margin="8,0">
+				<LayoutTransformControl.LayoutTransform>
+					<RotateTransform Angle="90" />
+				</LayoutTransformControl.LayoutTransform>
+				<Grid>
+					<Separator Margin="0" />
+				</Grid>
+			</LayoutTransformControl>
+
+			<Grid Grid.Column="2"
+				  RowDefinitions="Auto,Auto,*,Auto">
+
+				<Grid Grid.Row="1" Margin="0,0,0,4"
+					  ColumnDefinitions="*,Auto,Auto">
+					<TextBlock Grid.Column="0" VerticalAlignment="Center">标签</TextBlock>
+					<Button Grid.Column="1" Margin="0,0,4,0"
+							i:Attached.Icon="mdi-tag-plus-outline"
+							ToolTip.Tip="新增标签">
+						<Button.Flyout>
+							<Flyout>
+								<TextBox Grid.Row="0" Margin="0,0,0,6"
+										 Watermark="输入新标签（回车确认）"
+										 MinWidth="180"
+										 KeyUp="NewLabel_KeyUp" />
+							</Flyout>
+						</Button.Flyout>
+					</Button>
+					<Button Grid.Column="2" Foreground="#ff4d4f"
+							Command="{Binding RemoveTagsCommand}"
+							i:Attached.Icon="mdi-tag-remove-outline"
+							ToolTip.Tip="移除标签" />
+				</Grid>
+
+				<ListBox Grid.Row="2" Margin="0,0,0,4"
+						 CornerRadius="3"
+						 Background="Transparent"
+						 ItemsSource="{Binding AllTags}"
+						 SelectionMode="Multiple"
+						 SelectedItems="{Binding SelectedTags}" />
+				<Grid Grid.Row="3" ColumnDefinitions="*,*">
+					<Button Grid.Column="0" Margin="0,0,4,0"
+						HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"
+						Command="{Binding AddTagsToFilesCommand}"
+						i:Attached.Icon="mdi-tag-arrow-left-outline"
+						ToolTip.Tip="添加选中标签到文件" />
+					<Button Grid.Column="1" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"
+							Command="{Binding RemoveTagsFromFilesCommand}"
+							i:Attached.Icon="mdi-tag-arrow-right-outline"
+							ToolTip.Tip="从文件移除选中标签" />
+				</Grid>
+
+			</Grid>
+		</Grid>
+	</Grid>
+</UserControl>
